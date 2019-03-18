@@ -105,19 +105,12 @@ static void replace_tasklet_schedule(struct stavix_dev *dev)
 	u8 tid,k;
 	int i;
 	u32 cdesc;
-	int print_flag=1;
-//###########debug_define	
-	u8 tid_debug;
-	u32 cnt = 0;
-//################ end
+	
 	spin_lock(&dev->adap_lock);		
 	cdesc = pci_read(SG_DMA_BASE, SG_DMA_REG_CURDESC);
 	k = (cdesc - AXI_PCIE_SG_ADDR)/SEG_SIZE/BD_NUM;
-	if(k ==adapter->dma.buf_cnt)
-	print_flag = 0;	
 	adapter->dma.buf_cnt = k;
-	if(k>7)
-	printk(KERN_INFO"k>7,k=%d",k);	
+
 	if(k==0)
 	k=0x04;
 	else if(k==1)
@@ -132,15 +125,7 @@ static void replace_tasklet_schedule(struct stavix_dev *dev)
 	data = adapter->dma.buf[k];
 
 	for(i = 0; i < TS_NUM; i++) {
-		tid = data[0]&0x07;
-//debug_start
-		tid_debug = data[0]&0xFF;
-		if(tid_debug == 0x47){
-		cnt++;
-		}
-		if((i == (TS_NUM-1))&&cnt&&print_flag)
-		printk(KERN_INFO"total %d packets wrong\n",cnt);
-//debug_end		
+		tid = data[0]&0x07;	
 		data[0] = 0x47;	
 		dvb_dmx_swfilter_packets(&(dev->adapter[tid].demux), data, 1);
 		data =  data + 192;
@@ -161,7 +146,6 @@ int sg_dma_irq_process(struct stavix_dev *dev, u32 status)
 	if(status & SG_DMA_XR_IRQ_ERROR_MASK) {
 		
 	spin_lock_irq(&dev->adapter->adap_lock);
-	printk(KERN_INFO"SG_DMA IRQ_ERR happened\n"); 
 	sg_dma_channel_reset(dev);
 	sg_dma_init_chan_bd(&dev->adapter->dma);
 	sg_dma_reg_init(dev); 
