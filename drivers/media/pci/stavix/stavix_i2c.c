@@ -255,9 +255,9 @@ static int xiic_busy(struct stavix_i2c *i2c)
 	//sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET);
 	//err = (sr & STAVIX_SR_BUS_BUSY_MASK) ? -EBUSY : 0;
 	while (err && tries--) {
-		msleep(1);
 		sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET);
 		err = (sr & STAVIX_SR_BUS_BUSY_MASK) ? -EBUSY : 0;
+		msleep(1);
 	}
 	return err;
 }
