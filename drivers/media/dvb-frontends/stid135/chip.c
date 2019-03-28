@@ -246,7 +246,7 @@ STCHIP_Handle_t ChipOpen(STCHIP_Info_t *hChipOpenParams)
 			
 			if(hChip->pFieldMapImage != NULL)
 			{
-				if((ChipGetHandleFromName(hChipOpenParams->Name)==NULL) && (AppendNode(hChip)!=NULL)) 
+				if(AppendNode(hChip)!=NULL) 
 				{
 					hChip->pI2CHost = hChipOpenParams->pI2CHost;
 					hChip->I2cAddr = hChipOpenParams->I2cAddr;
@@ -573,7 +573,6 @@ STCHIP_Error_t ChipGetOneRegister(STCHIP_Handle_t hChip, u16 RegAddr, u32* data_
 STCHIP_Error_t  ChipSetRegisters(STCHIP_Handle_t hChip, u16 FirstReg, s32 NbRegs)
 {
 	u8 data[100],nbdata = 0;
-	u8 dataR[100],nbdataR = 0;
 	s32 i, j, firstRegIndex;
 	//s32 j;
 
@@ -623,21 +622,9 @@ STCHIP_Error_t  ChipSetRegisters(STCHIP_Handle_t hChip, u16 FirstReg, s32 NbRegs
 						if(hChip->Repeater && hChip->RepeaterHost && hChip->RepeaterFn)
 							hChip->RepeaterFn(hChip->RepeaterHost,TRUE);	/* Set repeater ON */
 							
-						for(i=0;i<100;i++)
-						{
-							dataR[i] = data[i]; 
-						}
-						nbdataR = nbdata;
-					
-						if(I2cReadWrite(hChip->pI2CHost,I2C_WRITE,hChip->I2cAddr,data,nbdata) == I2C_ERR_NONE)	/* write data buffer */
-							printk(KERN_INFO"");
-						else if(I2cReadWrite(hChip->pI2CHost,I2C_WRITE,hChip->I2cAddr,data,nbdata) == I2C_ERR_NONE){
-							
-							printk(KERN_INFO"Write Data Buffer again!\n");
-						}
-						else{  hChip->Error = CHIPERR_I2C_NO_ACK;
-							printk(KERN_ERR"Write Data Buffer failed!\n");
-						}
+						if(I2cReadWrite(hChip->pI2CHost,I2C_WRITE,hChip->I2cAddr,data,nbdata) != I2C_ERR_NONE)	/* write data buffer */
+							hChip->Error = CHIPERR_I2C_NO_ACK;
+
 						if(hChip->Repeater && hChip->RepeaterHost && hChip->RepeaterFn)
 							hChip->RepeaterFn(hChip->RepeaterHost,FALSE);	/* Set repeater OFF */
 					
