@@ -76,6 +76,22 @@ static void xiic_reinit(struct stavix_i2c *i2c)
 	pci_write(STAVIX_I2C_BASE, STAVIX_DGIER_OFFSET, STAVIX_GINTR_ENABLE_MASK);
 
 	xiic_irq_clr_en(i2c, STAVIX_INTR_ARB_LOST_MASK);
+		
+	pci_write(STAVIX_I2C_BASE,STAVIX_TSUSTA_REG_OFFSET,400);
+	
+	pci_write(STAVIX_I2C_BASE,STAVIX_TSUSTO_REG_OFFSET,400);
+	
+	pci_write(STAVIX_I2C_BASE,STAVIX_THDSTA_REG_OFFSET,400);
+	
+	pci_write(STAVIX_I2C_BASE,STAVIX_TSUDAT_REG_OFFSET,400);
+	
+	pci_write(STAVIX_I2C_BASE,STAVIX_TBUF_REG_OFFSET,400);
+	
+	pci_write(STAVIX_I2C_BASE,STAVIX_THIGH_REG_OFFSET,400);
+	
+	pci_write(STAVIX_I2C_BASE,STAVIX_TLOW_REG_OFFSET,400);
+	
+	pci_write(STAVIX_I2C_BASE,STAVIX_THDAT_REG_OFFSET,400);
 }
 
 static void xiic_deinit(struct stavix_i2c *i2c)
@@ -252,8 +268,11 @@ static int xiic_busy(struct stavix_i2c *i2c)
 	int err = 1;
 	u32 sr;
 
-	//sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET);
-	//err = (sr & STAVIX_SR_BUS_BUSY_MASK) ? -EBUSY : 0;
+	if(i2c->tx_msg)
+		return -EBUSY;
+		
+	sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET);
+	err = (sr & STAVIX_SR_BUS_BUSY_MASK) ? -EBUSY : 0;
 	while (err && tries--) {
 		sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET);
 		err = (sr & STAVIX_SR_BUS_BUSY_MASK) ? -EBUSY : 0;
