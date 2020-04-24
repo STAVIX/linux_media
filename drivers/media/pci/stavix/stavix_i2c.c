@@ -271,12 +271,13 @@ static int xiic_busy(struct stavix_i2c *i2c)
 	if(i2c->tx_msg)
 		return -EBUSY;
 		
-	sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET);
-	err = (sr & STAVIX_SR_BUS_BUSY_MASK) ? -EBUSY : 0;
+//	sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET);
+//	err = (sr & STAVIX_SR_BUS_BUSY_MASK) ? -EBUSY : 0;
 	while (err && tries--) {
 		sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET);
 		err = (sr & STAVIX_SR_BUS_BUSY_MASK) ? -EBUSY : 0;
-		msleep(1);
+		if(err)
+			msleep(1);
 	}
 	return err;
 }
@@ -392,7 +393,7 @@ static int xiic_xfer(struct i2c_adapter *i2c_adap, struct i2c_msg *msgs, int num
 	
 	err = xiic_busy(i2c);
  	if (err){
-		printk(KERN_INFO"xiic_busy!!\n");	
+		pr_err("xilinx i2c busy \n");	
 		goto out; 
 	}
 	i2c->tx_msg = msgs;
@@ -404,12 +405,14 @@ static int xiic_xfer(struct i2c_adapter *i2c_adap, struct i2c_msg *msgs, int num
 	if (wait_event_timeout(i2c->wq, (i2c->state == STATE_ERROR) || 
 		(i2c->state == STATE_DONE), HZ)) { 
 		err = (i2c->state == STATE_DONE) ? num : -EIO;
+		if(err != num)
+			pr_err("xilinx i2c undone \n");
 	} else {
 		i2c->tx_msg = NULL;
 		i2c->rx_msg = NULL;
 		i2c->nmsgs = 0;
 		err = -ETIMEDOUT;
-		pr_err("xiic xfer i2c read error 2\n");
+		pr_err("xilinx i2c xfer read error \n");
 
 	}
 	
