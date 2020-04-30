@@ -142,7 +142,6 @@ static void replace_tasklet_schedule(struct stavix_dev *dev)
                         data =  data + 192;
                         }
                 else{
-			i = i + 1;
                         for(j = 0; j < 192; j++)
                         {
                                 if(data[0] <= 0x07)
@@ -150,6 +149,7 @@ static void replace_tasklet_schedule(struct stavix_dev *dev)
                                         data = data + 192;
                                         if(data[0] <= 0x07){
                                           data = data - 192;
+					  i = i + 1;
                                           break;
                                         }else{
                                           data = data - 192;
