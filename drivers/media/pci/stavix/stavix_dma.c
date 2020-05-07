@@ -124,7 +124,7 @@ static void replace_tasklet_schedule(struct stavix_dev *dev)
 	
 	data = adapter->dma.buf[k];
 
-/*	for(i = 0; i < TS_NUM; i++) {
+	for(i = 0; i < TS_NUM; i++) {
 		//tid = data[0]&0x07;
 		tid = data[0];
 		data[0] = 0x47;	
@@ -132,9 +132,9 @@ static void replace_tasklet_schedule(struct stavix_dev *dev)
 		dvb_dmx_swfilter_packets(&(dev->adapter[tid].demux), data, 1);
 		}
 		data =  data + 192;
-	}*/
+	}
 	
-        for(i = 0; i < TS_NUM; i++){
+ /*       for(i = 0; i < TS_NUM; i++){
                 tid = data[0];
                 if(tid <= 0x07){
                         data[0] = 0x47;
@@ -161,7 +161,7 @@ static void replace_tasklet_schedule(struct stavix_dev *dev)
                                 }
                         }
                 }
-        }
+        }*/
 	
 	spin_unlock(&dev->adap_lock);	
 }
