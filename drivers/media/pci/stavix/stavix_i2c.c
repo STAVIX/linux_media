@@ -408,7 +408,10 @@ static int xiic_xfer(struct i2c_adapter *i2c_adap, struct i2c_msg *msgs, int num
 		err = (i2c->state == STATE_DONE) ? num : -EIO;
 		if(err != num){
 			xfer_sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET))
+			printk(KERN_INFO"xfer_status is %d", xfer_sr);
 			pr_err("xilinx i2c undone \n");
+		}
+			
 	} else {
 		i2c->tx_msg = NULL;
 		i2c->rx_msg = NULL;
