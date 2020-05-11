@@ -390,6 +390,7 @@ static int xiic_xfer(struct i2c_adapter *i2c_adap, struct i2c_msg *msgs, int num
 	struct stavix_i2c *i2c = i2c_get_adapdata(i2c_adap);
 	struct stavix_dev *dev = i2c->dev;
 	int err;
+	u8 xfer_sr;
 	
 	err = xiic_busy(i2c);
  	if (err){
@@ -405,7 +406,8 @@ static int xiic_xfer(struct i2c_adapter *i2c_adap, struct i2c_msg *msgs, int num
 	if (wait_event_timeout(i2c->wq, (i2c->state == STATE_ERROR) || 
 		(i2c->state == STATE_DONE), HZ)) { 
 		err = (i2c->state == STATE_DONE) ? num : -EIO;
-		if(err != num)
+		if(err != num){
+			xfer_sr = pci_read(STAVIX_I2C_BASE, STAVIX_SR_REG_OFFSET))
 			pr_err("xilinx i2c undone \n");
 	} else {
 		i2c->tx_msg = NULL;
